@@ -23,7 +23,7 @@ import OrdersManage from "../pages/store/OrdersManage";
 import ProductRental from "../pages/store/ProductRental";
 import MyAccount from "../pages/user/MyAccount";
 import HomeUser from "../pages/user/HomeUser";
-import Payment from "../pages/user/payment";
+import Payment from "../pages/user/Payment";
 import Register from "../pages/auth/Register";
 import ProtectRouteUser from "./ProtectRouteUser";
 import ProtectRouteAdmin from "./ProtectRouteAdmin";
