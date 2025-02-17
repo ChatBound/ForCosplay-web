@@ -10,7 +10,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 const initialState = {
   name: "",
   description: "",
-  size: "",
+  sizes: [],
   salePrice: 0,
   rentalPrice: 0,
   quantity: 0,
@@ -20,22 +20,15 @@ const initialState = {
 };
 
 const FromEditProduct = () => {
-
   const { id } = useParams()
   const navigate = useNavigate()
-
   const [purchaseType, setPurchaseType] = useState("");
-
   const token = useEcomStore((state) => state.token);
   const getCategory = useEcomStore((state) => state.getCategory);
   const categories = useEcomStore((state) => state.categories);
   const getProduct = useEcomStore((state) => state.getProduct);
-
-  
-
   const [form, setForm] = useState(initialState);
 
- 
   useEffect(() => {
     getCategory()
     getProduct();
@@ -44,21 +37,51 @@ const FromEditProduct = () => {
 
   const fetchProduct = async (token, id, form) => {
     try {
-        // code
-        const res = await readProduct(token, id, form)
-        console.log('res from backend', res)
-        setForm(res.data)
+      const res = await readProduct(token, id, form);
+      console.log("res from backend", res);
+  
+      // Ensure all fields are set correctly
+      if (res.data) {
+        setForm((prev) => ({
+          ...prev,
+          name: res.data.name || "",
+          description: res.data.description || "",
+          sizes: Array.isArray(res.data.sizes) ? [...res.data.sizes] : [],
+          salePrice: res.data.salePrice || 0,
+          rentalPrice: res.data.rentalPrice || 0,
+          quantity: res.data.quantity || 0,
+          available: res.data.available || false,
+          categoryId: res.data.categoryId || "",
+          images: Array.isArray(res.data.images) ? [...res.data.images] : [],
+        }));
+      }
     } catch (err) {
-        console.log('Err fetch data', err)
+      console.log("Err fetch data", err);
     }
-}
-console.log(form)
+  };
 
   const handleOnChange = (e) => {
-    const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: value,
+    const { name, value, type, checked } = e.target;
+  
+    setForm((prev) => {
+      if (type === "checkbox") {
+        return {
+          ...prev,
+          [name]: checked
+            ? [...new Set([...prev[name], value])] // Add value without duplicates
+            : prev[name].filter((s) => s !== value), // Remove value
+        };
+      } else if (type === "file") {
+        return {
+          ...prev,
+          images: [...prev.images, ...e.target.files], // Handle file uploads
+        };
+      } else {
+        return {
+          ...prev,
+          [name]: value,
+        };
+      }
     });
   };
 
@@ -154,27 +177,25 @@ console.log(form)
                 </select>
               </div>
 
-              {/* Size */}
-              <div className="!my-3">
+      {/* sizes */}
+      <div className="!my-3">
                 <label className="block text-sm font-medium !py-1">
                   ขนาด <span className="text-red-500">*</span>
                 </label>
-                <select
-                  name="size"
-                  value={form.size}
-                  onChange={handleOnChange}
-                  className="w-full border !p-2 rounded-md"
-                  required
-                >
-                  <option value="" disabled>
-                    กรุณาเลือกขนาด
-                  </option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                  <option value="XXL">XXL</option>
-                </select>
+                <div className="flex flex-wrap gap-3">
+                  {["S", "M", "L", "XL", "XXL"].map((sizes) => (
+                    <label key={sizes} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="sizes"
+                        value={sizes}
+                        checked={form.sizes.includes(sizes)} // Check if sizes is selected
+                        onChange={handleOnChange}
+                      />
+                      {sizes}
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {/* Quantity */}

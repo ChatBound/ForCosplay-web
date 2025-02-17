@@ -81,6 +81,7 @@ const History = () => {
                     <tr>
                       <th className="!py-2 !px-4">สินค้า</th>
                       <th className="!py-2 !px-4">ราคา</th>
+                      <th className="!py-2 !px-4">ขนาด</th>
                       <th className="!py-2 !px-4">จำนวน</th>
                       <th className="!py-2 !px-4">รวม</th>
                     </tr>
@@ -98,6 +99,7 @@ const History = () => {
                               : 0
                           )}
                         </td>
+                        <td className="!py-2 !px-4">{item.size}</td>
                         <td className="!py-2 !px-4">{costume.count}</td>
                         <td className="!py-2 !px-4">
                           {numberFormat(

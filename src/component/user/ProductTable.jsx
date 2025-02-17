@@ -59,7 +59,7 @@ const ProductTable = () => {
     { name: "ชื่อสินค้า", selector: (row) => row.name, sortable: true ,width: "100px"},
     {
       name: "ขนาด",
-      selector: (row) => row.size,
+      selector: (row) => row.sizes,
       sortable: true,
       width: "80px",
     },

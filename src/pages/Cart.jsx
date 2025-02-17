@@ -32,13 +32,28 @@ const Cart = () => {
         return;
       }
   
+      const hasInvalidItems = cart.some(
+        (item) =>
+          !item.selectedPurchaseType || // ตรวจสอบว่าเลือกประเภทการซื้อแล้ว
+          !item.selectedSize // ตรวจสอบว่าเลือกขนาดแล้ว
+      );
+  
+      if (hasInvalidItems) {
+        toast.error("กรุณาเลือกประเภทการซื้อและขนาดสำหรับสินค้าทุกรายการ");
+        return;
+      }
+  
       const formattedCart = cart.map((item) => ({
         id: item.id,
         quantity: item.count, // ใช้ count จาก state
-        salePrice: item.selectedPurchaseType === "RENTAL"
-        ? item.rentalPrice
-        : item.salePrice,
+        salePrice: item.selectedPurchaseType === "RENTAL" ? item.rentalPrice : item.salePrice,
         selectedPurchaseType: item.selectedPurchaseType, // เพิ่มค่า selectedPurchaseType
+        size : item.selectedSize,
+        selectedSize: item.selectedSize,
+        
+        
+        
+        // เพิ่มขนาดสินค้า
       }));
   
       await createUserCart(token, { cart: formattedCart })
@@ -91,6 +106,7 @@ const Cart = () => {
                 <p className=" text-xs sm:text-lg font-medium">
                   {product.name}
                 </p>
+                <p className="text-gray-500 text-xs">เหลือ: {product.quantity} ชิ้น</p>
                 <p className=" text-sm text-gray-500">ประเภท: 
                   <span className="!mx-1">
                   {(product.selectedPurchaseType === "RENTAL"
@@ -101,7 +117,7 @@ const Cart = () => {
                     </p>
                 <div className=" flex items-center gap-5 !mt-2">
                 <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100">
-                      {product.size}
+                      {product.selectedSize}
                     </p>
 
                   <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100"></p>
@@ -154,6 +170,7 @@ const Cart = () => {
                 )}
               </div>
               {/* Right */}
+              
             </div>
 
             <span

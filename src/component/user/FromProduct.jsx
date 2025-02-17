@@ -8,7 +8,7 @@ import Uploadfile from "./Uploadfile";
 const initialState = {
   name: "",
   description: "",
-  size: "",
+  sizes: [],
   salePrice: 0,
   rentalPrice: 0,
   quantity: 0,
@@ -35,10 +35,27 @@ const FromProduct = () => {
   }, []);
 
   const handleOnChange = (e) => {
-    const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: value,
+    const { name, value, type, checked } = e.target;
+  
+    setForm((prev) => {
+      if (type === "checkbox") {
+        return {
+          ...prev,
+          [name]: checked
+            ? [...new Set([...prev[name], value])] // Add value without duplicates
+            : prev[name].filter((s) => s !== value), // Remove value
+        };
+      } else if (type === "file") {
+        return {
+          ...prev,
+          images: [...prev.images, ...e.target.files], // Handle file uploads
+        };
+      } else {
+        return {
+          ...prev,
+          [name]: value,
+        };
+      }
     });
   };
 
@@ -134,27 +151,25 @@ const FromProduct = () => {
                 </select>
               </div>
 
-              {/* Size */}
-              <div className="!my-3">
+             {/* sizes */}
+             <div className="!my-3">
                 <label className="block text-sm font-medium !py-1">
                   ขนาด <span className="text-red-500">*</span>
                 </label>
-                <select
-                  name="size"
-                  value={form.size}
-                  onChange={handleOnChange}
-                  className="w-full border !p-2 rounded-md"
-                  required
-                >
-                  <option value="" disabled>
-                    กรุณาเลือกขนาด
-                  </option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                  <option value="XXL">XXL</option>
-                </select>
+                <div className="flex flex-wrap gap-3">
+                  {["S", "M", "L", "XL", "XXL"].map((sizes) => (
+                    <label key={sizes} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="sizes"
+                        value={sizes}
+                        checked={form.sizes.includes(sizes)} // Check if size is selected
+                        onChange={handleOnChange}
+                      />
+                      {sizes}
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {/* Quantity */}

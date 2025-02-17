@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"; // เพิ่ม useParams
 import useEcomStore from "../store/ecom-store";
 import RelatedProducts from "../component/product/RelatedProducts";
 import { Button } from "@material-tailwind/react";
+import { toast } from "react-toastify";
 
 const Product = () => {
   const getProduct = useEcomStore((state) => state.getProduct);
@@ -11,13 +12,16 @@ const Product = () => {
   const actionAddtoCart = useEcomStore((state) => state.actionAddtoCart);
   const cart = useEcomStore((state) => state.carts);
 
-
   const { productId } = useParams(); // รับ productId จาก URL
   const [mainImage, setMainImage] = useState(""); // รูปหลักที่แสดงผล
   const [loading, setLoading] = useState(true); // สถานะโหลดข้อมูล
   const [selectedPurchaseType, setSelectedPurchaseType] = useState(""); // บันทึกประเภทการซื้อ
-  const [size, setSize] = useState(""); // บันทึกขนาดที่เลือก
-  const [sold, setSold] = useState({}); // sold เป็น object ที่เก็บจำนวนสินค้าที่ถูกขายไปตาม productId
+
+  const [selectedSize, setSelectedSize] = useState(""); // State สำหรับเก็บขนาดที่เลือก
+
+  const setSize = (sizes) => {
+    setSelectedSize(sizes); // อัปเดตขนาดที่เลือก
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +41,10 @@ const Product = () => {
 
   if (!product) {
     return <p className="text-center text-gray-500">ไม่มีข้อมูลสินค้า</p>;
+  }
+
+  if (product.salePrice === 0 && product.rentalPrice === 0) {
+    return <p className="text-center text-gray-500">สินค้านี้ไม่พร้อมใช้งาน</p>;
   }
 
   if (!Array.isArray(product.images) || product.images.length === 0) {
@@ -129,31 +137,46 @@ const Product = () => {
           <div className="flex flex-col gap-4 !my-8">
             <p>เลือกขนาด</p>
             <div className="flex gap-2">
-              <Button
-                onClick={() => setSize(product.size)}
-                className={`border border-gray-100 text-black !py-2 !px-6 bg-gray-100 ${
-                  product.size === size ? "border-gray-500 bg-gray-300" : ""
-                }`}
-              >
-                {product.size}
-              </Button>
+              {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
+                product.sizes.map((sizes, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => setSize(sizes)} // เซ็ตค่า size เมื่อคลิกปุ่ม
+                    className={`border border-gray-100 text-black !py-2 !px-6 bg-gray-100 ${
+                      sizes === selectedSize ? "border-gray-500 bg-gray-300" : ""
+                    }`}
+                  >
+                    {sizes}
+                  </Button>
+                ))
+              ) : (
+                <p>ไม่มีขนาดสินค้า</p> // แสดงข้อความหากไม่มีขนาด
+              )}
             </div>
           </div>
-   
-          {/* เพิ่มสินค้าลงตะกร้า */}
+          {/* เพิ่มสินค้าลงตะกร้า   ------------------- */}
+
           <Button
-            onClick={() =>
+            onClick={() => {
+              if (!selectedPurchaseType) {
+                alert("กรุณาเลือกประเภทการซื้อ (ซื้อ/เช่า)");
+                return;
+              }
+              if (!selectedSize) {
+                alert("กรุณาเลือกขนาด");
+                return;
+              }
               actionAddtoCart({
                 ...product,
                 selectedPurchaseType: selectedPurchaseType,
-              })
-            }
+                selectedSize: selectedSize,
+              });
+              toast.success("สินค้าถูกเพิ่มลงตะกร้าเรียบร้อยแล้ว!");
+            }}
             className="bg-black text-white !px-8 !py-3 text-sm active:bg-gray-700"
-            disabled={(product.quantity === 0)}
+            disabled={product.quantity === 0}
           >
-            {product.quantity === 0
-              ? "สินค้าหมดแล้ว"
-              : "เพิ่มสินค้าลงตะกร้า"}
+            {product.quantity === 0 ? "สินค้าหมดแล้ว" : "เพิ่มสินค้าลงตะกร้า"}
           </Button>
           {/* จำนวนสินค้า */}
           <p className="!mt-2 text-gray-500">
@@ -169,6 +192,10 @@ const Product = () => {
       </div>
       {/* สินค้าที่เกี่ยวข้อง */}
       <RelatedProducts category={product.category?.id || ""} />
+      {!product.category && (
+        <p className="text-center text-gray-500">ไม่มีสินค้าที่เกี่ยวข้อง</p>
+      )}
+
     </div>
   );
 };

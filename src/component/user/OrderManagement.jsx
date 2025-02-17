@@ -93,6 +93,16 @@ const OrderManagement = () => {
       width: "80px",
     },
     {
+      name: "ไซส์",
+      selector: (row) => (
+        <div>
+          <p>{row.size}</p>
+        </div>
+      ),
+      sortable: true,
+      width: "80px",
+    },
+    {
       name: "",
       selector: (row) => (
         <button
@@ -168,6 +178,10 @@ const OrderManagement = () => {
             <p>
               <strong>วันที่สั่งซื้อ:</strong> {dateFormat(selectedOrder.createdAt)}
             </p>
+            
+            <p>
+              <strong>ขนาด:</strong> {selectedOrder.size}
+            </p>
 
             <h3 className="text-lg font-semibold !mt-4">รายการสินค้า</h3>
             {selectedOrder.costumes?.map((costume, index) => (
@@ -175,9 +189,6 @@ const OrderManagement = () => {
                 <li className="flex justify-between">
                   <span>{costume.costume.name}</span>
                 </li>
-              <li>
-                <span>ขนาด : {costume.costume.size} </span>
-              </li>
               <li>
               <span> จำนวน :
                     {costume.count} x {" "}
