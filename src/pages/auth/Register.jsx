@@ -40,7 +40,7 @@ const Register = () => {
   // Handle form submission
   const onSubmitHandler = async (data) => {
     try {
-      const response = await axios.post("https://for-cosplay-api.vercel.app/api/register", data);
+      const response = await axios.post("https://forcosplay.com/api/register", data);
 
       if (response.status === 200 || response.status === 201) {
         toast.success("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");

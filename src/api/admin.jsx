@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// https://for-cosplay-api.vercel.app/api/admin/orders
+// https://forcosplay.com/api/admin/orders
 
 export const getOrdersAdmin = async (token) => {
   // code body
-  return axios.get("https://for-cosplay-api.vercel.app/api/admin/orders", {
+  return axios.get("https://forcosplay.com/api/admin/orders", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -13,7 +13,7 @@ export const getOrdersAdmin = async (token) => {
 export const changeOrderStatus = async (token, orderBy, status) => {
   // code body
   return axios.put(
-    "https://for-cosplay-api.vercel.app/api/admin/order-status",
+    "https://forcosplay.com/api/admin/order-status",
     {
       orderBy,
       status,
@@ -29,7 +29,7 @@ export const changeOrderStatus = async (token, orderBy, status) => {
 
 export const getListAllUsers = async (token) => {
   // code body
-  return axios.get("https://for-cosplay-api.vercel.app/api/users", {
+  return axios.get("https://forcosplay.com/api/users", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -38,7 +38,7 @@ export const getListAllUsers = async (token) => {
 
 export const changeUserStatus = async (token,value) => {
   // code body
-  return axios.post("https://for-cosplay-api.vercel.app/api/change-status",value, {
+  return axios.post("https://forcosplay.com/api/change-status",value, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -47,7 +47,7 @@ export const changeUserStatus = async (token,value) => {
 
 export const changeUserRole = async (token,value) => {
   // code body
-  return axios.post("https://for-cosplay-api.vercel.app/api/change-role",value, {
+  return axios.post("https://forcosplay.com/api/change-role",value, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

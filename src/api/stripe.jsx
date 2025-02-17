@@ -2,7 +2,7 @@ import axios from 'axios'
 
 
 export const payment = async (token) => 
-    await axios.post('https://for-cosplay-api.vercel.app/api/user/create-payment-intent', {}, {
+    await axios.post('https://forcosplay.com/api/user/create-payment-intent', {}, {
     headers: {
         Authorization: `Bearer ${token}`
     }
