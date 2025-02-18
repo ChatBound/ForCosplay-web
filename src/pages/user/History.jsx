@@ -83,6 +83,7 @@ const History = () => {
                       <th className="!py-2 !px-4">ราคา</th>
                       <th className="!py-2 !px-4">ขนาด</th>
                       <th className="!py-2 !px-4">จำนวน</th>
+                      <th className="!py-2 !px-4">ประเภท</th>
                       <th className="!py-2 !px-4">รวม</th>
                     </tr>
                   </thead>
@@ -99,8 +100,18 @@ const History = () => {
                               : 0
                           )}
                         </td>
-                        <td className="!py-2 !px-4">{item.size}</td>
+                        <td className="!py-2 !px-4">{costume.size}</td>
                         <td className="!py-2 !px-4">{costume.count}</td>
+                        <td className="!py-2 !px-4">
+                  
+                          {costume.type === "PURCHASE" && (
+                            <p>ซื้อ</p>
+                          )}
+                          {costume.type === "RENTAL" && (
+                            <p>เช่า</p>
+                          )}
+
+                        </td>
                         <td className="!py-2 !px-4">
                           {numberFormat(
                             costume.count *

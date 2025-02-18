@@ -75,35 +75,14 @@ const OrderManagement = () => {
     },
 
     {
-      name: "สินค้า",
-      selector: (row) => (
-        <ul>
-          {row.costumes?.map((costume, index) => (
-            <li key={index}>
-              {costume.costume.name}
-            </li>
-          ))}
-        </ul>
-      ),width: "150px"
-    },
-    {
-      name: "รวม",
+      name: "ยอดรวม",
       selector: (row) => numberFormat(row.totalPrice),
       sortable: true,
-      width: "80px",
+      width: "100px",
     },
+
     {
-      name: "ไซส์",
-      selector: (row) => (
-        <div>
-          <p>{row.size}</p>
-        </div>
-      ),
-      sortable: true,
-      width: "80px",
-    },
-    {
-      name: "",
+      name: "คำสั้งซื้อ",
       selector: (row) => (
         <button
         className="bg-blue-500 hover:bg-blue-600 text-white !px-3 !py-1 rounded-md shadow-md"
@@ -164,65 +143,53 @@ const OrderManagement = () => {
       className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${
         isModalOpen ? "opacity-100 visible" : "opacity-0 invisible"
       }`}
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // Fix background transparency
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
-        <div className="bg-white !p-6 rounded-lg shadow-lg w-full max-w-2xl">
-          <h2 className="text-xl font-bold !mb-4">รายละเอียดออเดอร์</h2>
-          <div className="space-y-4">
-            <p>
-              <strong>ผู้ใช้งาน:</strong> {selectedOrder.orderBy.email}
-            </p>
-            <p>
-              <strong>ที่อยู่:</strong> {selectedOrder.orderBy.address}
-            </p>
-            <p>
-              <strong>วันที่สั่งซื้อ:</strong> {dateFormat(selectedOrder.createdAt)}
-            </p>
-            
-            <p>
-              <strong>ขนาด:</strong> {selectedOrder.size}
-            </p>
-
-            <h3 className="text-lg font-semibold !mt-4">รายการสินค้า</h3>
-            {selectedOrder.costumes?.map((costume, index) => (
-            <ul key={index} className="space-y-2">
-                <li className="flex justify-between">
-                  <span>{costume.costume.name}</span>
-                </li>
-              <li>
-              <span> จำนวน :
-                    {costume.count} x {" "}
-                    {numberFormat(
-                      costume.costume.salePrice > 0
-                        ? costume.costume.salePrice
-                        : costume.costume.rentalPrice > 0
-                        ? costume.costume.rentalPrice
-                        : 0
-                    )}
-                  </span>
-              </li>
-              <li>
-              <span> ราคารวม :
-              {numberFormat(selectedOrder.totalPrice)}
-                  </span>
-              </li>
-            </ul>
+      <div className="bg-white !p-6 rounded-lg shadow-2xl w-full max-w-2xl">
+        <h2 className="text-2xl font-bold !mb-6 text-gray-800">รายละเอียดออเดอร์</h2>
+        
+        <div className="space-y-4 text-gray-700">
+          <p><strong>ผู้ใช้งาน:</strong> {selectedOrder.orderBy.email}</p>
+          <p><strong>ที่อยู่:</strong> {selectedOrder.orderBy.address}</p>
+          <p><strong>วันที่สั่งซื้อ:</strong> {dateFormat(selectedOrder.createdAt)}</p>
+        </div>
+        
+        <h3 className="text-lg font-semibold !mt-6 border-b !pb-2">รายการสินค้า</h3>
+        <div className="space-y-4 !mt-4">
+          {selectedOrder.costumes?.map((costume, index) => (
+            <div key={index} className="!p-4 border  rounded-lg shadow-sm bg-gray-50">
+              <p><strong>{costume.costume.name}</strong></p>
+              <div className="grid grid-cols-2 gap-2 !mt-2 text-sm text-gray-600">
+                <span>จำนวน: {costume.count}</span>
+                <span>ขนาด: {costume.size}</span>
+                <span>ประเภท: {costume.type === "PURCHASE" ? "ซื้อ" : "เช่า"}</span>
+                <span>
+                  ราคา: {numberFormat(
+                    costume.costume.salePrice > 0
+                      ? costume.costume.salePrice
+                      : costume.costume.rentalPrice > 0
+                      ? costume.costume.rentalPrice
+                      : 0
+                  )} บาท
+                </span>
+              </div>
+            </div>
           ))}
-
-
-
-
-          </div>
-          <div className="!mt-6 text-right">
-            <button
-              className="bg-gray-500 hover:bg-gray-600 text-white !px-4 !py-2 rounded-md"
-              onClick={() => setIsModalOpen(false)}
-            >
-              ปิด
-            </button>
-          </div>
+        </div>
+        
+        <p className="text-end font-semibold text-lg !mt-6">ยอดรวม: {numberFormat(selectedOrder.totalPrice)} บาท</p>
+        
+        <div className="!mt-6 flex justify-end">
+          <button
+            className="bg-gray-600 hover:bg-gray-700 text-white !px-5 !py-2 rounded-lg transition"
+            onClick={() => setIsModalOpen(false)}
+          >
+            ปิด
+          </button>
         </div>
       </div>
+    </div>
+    
     );
   };
 
