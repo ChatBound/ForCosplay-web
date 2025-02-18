@@ -3,7 +3,7 @@ import axios from 'axios'
 
 export const createCategory = async (token, form) => {
     // code body
-    return axios.post('https://forcosplay.com/api/category', form, {
+    return axios.post('https://for-cosplay-web.vercel.app/api/category', form, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -12,12 +12,12 @@ export const createCategory = async (token, form) => {
 
 export const listCategory = async () => {
     // code body
-    return axios.get('https://forcosplay.com/api/category')
+    return axios.get('https://for-cosplay-web.vercel.app/api/category')
 }
 
 export const removeCategory = async (token, id) => {
     // code body
-    return axios.delete('https://forcosplay.com/api/category/'+id, {
+    return axios.delete('https://for-cosplay-web.vercel.app/api/category/'+id, {
         headers: {
             Authorization: `Bearer ${token}`
         }

@@ -29,7 +29,7 @@ const MyAccount = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        "https://forcosplay.com/api/user/update",
+        "https://for-cosplay-web.vercel.app/api/user/update",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -55,7 +55,7 @@ const MyAccount = () => {
         formData.append("image", file);
 
         const response = await axios.post(
-          "https://forcosplay.com/api/upload",
+          "https://for-cosplay-web.vercel.app/api/upload",
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
