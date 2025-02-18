@@ -35,6 +35,13 @@ const MainNav = () => {
           <hr className=" w-2/4 border-none h-[1.5px] bg-gray-700 hidden " />
         </NavLink>
         <NavLink
+          to={"/category"}
+          className="flex flex-col items-center gap-1 color-a"
+        >
+          <p> ข่าวสาร </p>
+          <hr className=" w-2/4 border-none h-[1.5px] bg-gray-700 hidden " />
+        </NavLink>
+        <NavLink
           to={"/contact"}
           className="flex flex-col items-center gap-1 color-a"
         >
@@ -157,6 +164,15 @@ const MainNav = () => {
           >
             {" "}
             สินค้า{" "}
+          </NavLink>
+          <NavLink
+            onClick={() => setVisible(false)}
+            className="!py-2 !pl-6 border"
+            style={{ padding: "10px" }}
+            to={"/category"}
+          >
+            {" "}
+            ข่าวสาร{" "}
           </NavLink>
           <NavLink
             onClick={() => setVisible(false)}
