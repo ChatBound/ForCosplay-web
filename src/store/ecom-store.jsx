@@ -22,7 +22,7 @@ const ecomStore = (set, get) => ({
   },
 
   actionLogin: async (formData) => {
-    const response = await axios.post("https://for-cosplay-api.vercel.app/api/login", formData);
+    const response = await axios.post("http://localhost:5001/api/login", formData);
     set({
       user: response.data.payload,
       token: response.data.token,
@@ -37,6 +37,7 @@ const ecomStore = (set, get) => ({
       console.log(err);
     }
   },
+  
   getProduct: async (count) => {
     try {
       const res = await listProduct(count);
@@ -82,17 +83,28 @@ const ecomStore = (set, get) => ({
       carts: state.carts.filter((item) => item.id !== productId),
     }));
   },
-  getTotalPrice: () => {
-  return get().carts.reduce((total, item) => {
+ // getTotalPrice: () => {
+ // return get().carts.reduce((total, item) => {
     // ตรวจสอบประเภทการซื้อ (selectedPurchaseType)
-    const price =
-      item.selectedPurchaseType === "RENTAL"
-      ? item.rentalPrice
-      : item.salePrice;
+  //  const price =
+  //    item.selectedPurchaseType === "RENTAL"
+  //    ? item.rentalPrice
+  //    : item.salePrice;
+//
+ //       return total + price * item.count;
+ // }, 0);
 
-        return total + price * item.count;
-  }, 0);
-},clearCart: () => set({ carts: [] }),
+  getTotalPrice: () => {
+    return get().carts.reduce((total, item) => {
+      const price =
+        item.selectedPurchaseType === "RENTAL"
+          ? item.rentalPrice * (item.selectedRentalDuration || 1) // คำนวณราคาเช่าตามจำนวนวัน
+          : item.salePrice; // ราคาขายปกติ
+      return total + price * item.count;
+    }, 0);
+ },
+ 
+ clearCart: () => set({ carts: [] }),
   
 });
 
