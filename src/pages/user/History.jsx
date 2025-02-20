@@ -8,25 +8,22 @@ import { dateFormat } from "../../utils/dateformat";
 const History = () => {
   const token = useEcomStore((state) => state.token);
   const [orders, setOrders] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); // เพิ่ม State สำหรับตรวจสอบการโหลด
+  const [isLoading, setIsLoading] = useState(true); // เพิ่ม State สำหรับตรวจสอบการโหลด
 
   useEffect(() => {
-    hdlGetOrders(token);
-  }, []);
-
-  const hdlGetOrders = (token) => {
-    setIsLoading(true); // เริ่มโหลด
-    getOrders(token)
-      .then((res) => {
+    const fetchOrders = async () => {
+      try {
+        const res = await getOrders(token);
         setOrders(res.data.orders);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+      } finally {
         setIsLoading(false); // สิ้นสุดการโหลด
-      });
-  };
+      }
+    };
+
+    fetchOrders();
+  }, [token]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -109,11 +106,9 @@ const History = () => {
                           <td className="!py-2 !px-4">
                             {numberFormat(
                               costume.count *
-                                (costume.costume.salePrice > 0
-                                  ? costume.costume.salePrice
-                                  : costume.costume.rentalPrice > 0
+                                (costume.type === "RENTAL"
                                   ? costume.costume.rentalPrice
-                                  : 0)
+                                  : costume.costume.salePrice)
                             )}
                           </td>
                           <td className="!py-2 !px-4">
@@ -131,11 +126,9 @@ const History = () => {
                           <td className="!py-2 !px-4">
                             {numberFormat(
                               costume.count *
-                                (costume.type === "RENTAL" &&
-                                costume.rentalDuration
-                                  ? costume.costume.rentalPrice *
-                                    costume.rentalDuration
-                                  : costume.costume.salePrice || 0)
+                                (costume.type === "RENTAL"
+                                  ? costume.costume.rentalPrice * costume.rentalDuration
+                                  : costume.costume.salePrice)
                             )}
                           </td>
                         </tr>
