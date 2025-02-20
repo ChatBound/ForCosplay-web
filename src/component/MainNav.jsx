@@ -74,7 +74,7 @@ const MainNav = () => {
                 className="flex flex-col gap-2 w-50 !py-3 !px-5 bg-slate-100 text-gray-500 rounded"
                 style={{ padding: "10px" }}
               >
-                <Link to="">
+                <Link to="/user/my-account">
                     <p className="cursor-pointer hover:text-black"> บัญชีของฉัน</p>
                 </Link>
                 <Link to="/user/history">

@@ -1,250 +1,239 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "../../component/home/Title";
-import { Button } from "@material-tailwind/react";
+import useEcomStore from "../../store/ecom-store";
+import { User, Mail, Lock, Pencil } from "lucide-react"; // Import Lucide icons
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const MyAccount = () => {
-  // Sample Data: User Profile
-  const [userProfile, setUserProfile] = useState({
-    username: "hekki",
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "-",
-    profileImage: "https://via.placeholder.com/100", // Default Image
+  const [user, setUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const logout = useEcomStore((state) => state.logout);
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
+  const token = useEcomStore((state) => state.token);
 
-  const [isEditing, setIsEditing] = useState(false); // Edit Mode
-  const [formData, setFormData] = useState({ ...userProfile }); // Form Data for Editing
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/user/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUser(response.data);
+        setFormData({
+          name: response.data.name,
+          email: response.data.email,
+          password: "",
+          confirmPassword: "",
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        alert("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้ กรุณาลองใหม่อีกครั้ง");
+      }
+    };
 
-  // Sample Data: Orders/Rentals History
-  const [orders, setOrders] = useState([
+    if (token) {
+      fetchUserData();
+    } else {
+     
+    }
+  }, [token]);
 
-  ]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-  // Add State for Filter Type
-  const [filterType, setFilterType] = useState("All"); // Default filter is "All"
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
+      return;
+    }
 
-  // Handle Update Profile
-  const handleUpdateProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        "https://for-cosplay-api.vercel.app/api/user/update",
-        formData,
+      await axios.patch(
+        "http://localhost:5001/api/user/update-profile",
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (response.data.message) {
-        alert(response.data.message);
-        setUserProfile(formData); // Update Local State
-        setIsEditing(false); // Exit Edit Mode
-      }
+
+      setUser({ name: formData.name, email: formData.email });
+      setIsEditing(false);
+      alert("บัญชีของคุณถูกอัปเดตเรียบร้อยแล้ว!");
+      navigate('/login')
+      logout();
     } catch (error) {
-      console.error(error);
-      alert("Failed to update profile");
+      console.error("Error updating profile:", error);
+      alert("เกิดข้อผิดพลาดในการอัปเดตบัญชี กรุณาลองใหม่อีกครั้ง");
     }
   };
 
-  // Handle Profile Image Upload
-  const handleProfileImageChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        const response = await axios.post(
-          "https://for-cosplay-api.vercel.app/api/upload",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-
-        const imageUrl = response.data.imageUrl;
-        setFormData((prev) => ({ ...prev, profileImage: imageUrl }));
-        setUserProfile((prev) => ({ ...prev, profileImage: imageUrl }));
-      } catch (error) {
-        console.error(error);
-        alert("Failed to upload image");
-      }
-    }
-  };
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="text-2xl text-center !pt-8 border-t border-gray-300">
+    <div className="container !mx-auto !px-4 !py-8">
+      {/* Title Section */}
+      <div className="text-center text-2xl !mb-8">
         <Title text1={"บัญชี"} text2={"ของฉัน"} />
       </div>
 
       {/* Profile Section */}
-      <div className="bg-white !p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl text-gray-600 !mb-4">ข้อมูลโปรไฟล์</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* รูปโปรไฟล์ */}
-          <div className="flex flex-col items-center justify-center">
-            <img
-              src={formData.profileImage}
-              alt="Profile"
-              className="w-32 h-32 rounded-full border-2 border-blue-500 transition-transform duration-300 hover:scale-105"
-            />
-            <div className="!mt-2 w-full flex justify-center">
-              <label className="cursor-pointer bg-blue-600 text-white !px-4 !py-2 rounded hover:bg-blue-700 transition-colors duration-200">
-                ✏️ เปลี่ยนรูปภาพ
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleProfileImageChange}
-                />
+      <div className="max-w-lg !mx-auto bg-white !p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-bold text-gray-800 !mb-4 flex items-center gap-2">
+          <User className="w-6 h-6 text-gray-800" /> {/* Lucide Icon */}
+          ข้อมูลบัญชี
+        </h2>
+
+        {isEditing ? (
+          <form onSubmit={handleProfileUpdate} className="space-y-4">
+            {/* Name Field */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700">
+                ชื่อผู้ใช้
               </label>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="!my-3">
-              <p className="text-sm text-gray-500">ชื่อผู้ใช้</p>
-              {isEditing ? (
+              <div className="!mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 !pl-3 flex items-center pointer-events-none">
+                  <User className="w-5 h-5 text-gray-400" /> {/* Lucide Icon */}
+                </div>
                 <input
                   type="text"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      username: e.target.value,
-                    }))
-                  }
-                  className="border !p-2 rounded w-full"
-                />
-              ) : (
-                <p className="text-lg">{userProfile.username}</p>
-              )}
-            </div>
-            <div className="!my-3">
-              <p className="text-sm text-gray-500">ชื่อ-นามสกุล</p>
-              {isEditing ? (
-                <input
-                  type="text"
+                  name="name"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  className="border !p-2 rounded w-full"
+                  onChange={handleChange}
+                  className="block w-full !pl-10 !pr-3 !py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  required
                 />
-              ) : (
-                <p className="text-lg">{userProfile.name}</p>
-              )}
+              </div>
             </div>
-            <div className="!my-3">
-              <p className="text-sm text-gray-500">อีเมล</p>
-              {isEditing ? (
+
+            {/* Email Field */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700">
+                อีเมล
+              </label>
+              <div className="!mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 !pl-3 flex items-center pointer-events-none">
+                  <Mail className="w-5 h-5 text-gray-400" /> {/* Lucide Icon */}
+                </div>
                 <input
                   type="email"
+                  name="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                  className="border !p-2 rounded w-full"
+                  onChange={handleChange}
+                  className="block w-full !pl-10 !pr-3 !py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  required
                 />
-              ) : (
-                <p className="text-lg">{userProfile.email}</p>
-              )}
+              </div>
             </div>
-            <div className="!my-3">
-              <p className="text-sm text-gray-500">เบอร์โทรศัพท์</p>
-              {isEditing ? (
+
+            {/* Password Field */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700">
+                รหัสผ่านใหม่
+              </label>
+              <div className="!mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 !pl-3 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-gray-400" /> {/* Lucide Icon */}
+                </div>
                 <input
-                  type="text"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, phone: e.target.value }))
-                  }
-                  className="border !p-2 rounded w-full"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full !pl-10 !pr-3 !py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-              ) : (
-                <p className="text-lg">{userProfile.phone}</p>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="flex justify-end gap-4">
-          {isEditing ? (
-            <>
-              <Button
+
+            {/* Confirm Password Field */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700">
+                ยืนยันรหัสผ่านใหม่
+              </label>
+              <div className="!mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 !pl-3 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-gray-400" /> {/* Lucide Icon */}
+                </div>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full !pl-10 !pr-3 !py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end !mt-3 space-x-2">
+              <button
+                type="button"
                 onClick={() => setIsEditing(false)}
-                className="bg-gray-600 text-white !px-4 !py-3 hover:bg-gray-700 transition-colors duration-200"
+                className="!px-4 !py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200"
               >
                 ยกเลิก
-              </Button>
-              <Button
-                onClick={handleUpdateProfile}
-                className="bg-blue-600 text-white !px-4 !py-3 hover:bg-blue-700 transition-colors duration-200"
+              </button>
+              <button
+                type="submit"
+                className="!px-4 !py-2 bg-black text-white rounded-md hover:bg-gray-600 transition duration-200"
               >
                 บันทึก
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-600 text-white !px-4 !py-3 hover:bg-blue-700 transition-colors duration-200"
-            >
-              ✏️ แก้ไขข้อมูลโปรไฟล์
-            </Button>
-          )}
-        </div>
-      </div>
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-4">
+            {/* Display User Data */}
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-gray-500" /> {/* Lucide Icon */}
+              <p>
+                <strong>ชื่อผู้ใช้:</strong> {user.name}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-gray-500" /> {/* Lucide Icon */}
+              <p>
+                <strong>อีเมล:</strong> {user.email}
+              </p>
+            </div>
 
-      {/* Orders/Rentals Section */}
-      <div className="bg-white !p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl text-gray-600 !mb-4">ประวัติคำสั่งซื้อ/เช่า</h2>
-        {/* Filter */}
-        <div className="!mb-4">
-          <label className="!mr-2 text-gray-600">กรองโดย:</label>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="border !p-1 rounded text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-          >
-            <option value="All">ทั้งหมด</option>
-            <option value="Buy">ซื้อ</option>
-            <option value="Hire">เช่า</option>
-          </select>
-        </div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-300">
-              <th className="text-left !pb-2 text-gray-600">ID</th>
-              <th className="text-left !pb-2 text-gray-600">วันที่</th>
-              <th className="text-left !pb-2 text-gray-600">สถานะ</th>
-              <th className="text-left !pb-2 text-gray-600">ประเภท</th>
-              <th className="text-left !pb-2 text-gray-600">สินค้า</th>
-              <th className="text-left !pb-2 text-gray-600">ยอดรวม</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders
-              .filter((order) => filterType === "All" || order.type === filterType)
-              .map((order) => (
-                <tr key={order.id} className="border-b border-gray-300 hover:bg-gray-100 transition-colors duration-200">
-                  <td className="!py-2">{order.id}</td>
-                  <td className="!py-2">{order.date}</td>
-                  <td className="!py-2">
-                    <span
-                      className={`!px-2 !py-1 rounded ${
-                        order.status === "Completed" ? "bg-green-500" : "bg-gray-500"
-                      } text-white`}
-                    >
-                      ✔️ {order.status}
-                    </span>
-                  </td>
-                  <td className="!py-2">{order.type}</td>
-                  <td className="!py-2">{order.items.join(", ")}</td>
-                  <td className="!py-2">฿{order.total.toLocaleString()}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+            {/* Edit Button */}
+            <button
+              onClick={() => {
+                setIsEditing(true);
+              }}
+              className="w-full flex items-center justify-center !mt-2 gap-2 !px-4 !py-2 bg-black text-white rounded-md hover:bg-gray-600 transition duration-200"
+            >
+              <Pencil className="w-5 h-5" /> {/* Lucide Icon */}
+              แก้ไขข้อมูล
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
