@@ -22,7 +22,7 @@ const ecomStore = (set, get) => ({
   },
 
   actionLogin: async (formData) => {
-    const response = await axios.post("http://localhost:5001/api/login", formData);
+    const response = await axios.post("https://for-cosplay-api.vercel.app/api/login", formData);
     set({
       user: response.data.payload,
       token: response.data.token,
