@@ -18,6 +18,19 @@ export const listUserCart = async (token) => {
   });
 };
 
+export const updateProfile = async (token, formData) => {
+  return axios.patch(
+    "https://for-cosplay-api.vercel.app/api/user/update-profile",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+
 export const saveAddress = async (token, address) => {
   // code body
   return axios.post(
