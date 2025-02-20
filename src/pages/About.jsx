@@ -4,44 +4,82 @@ import { assets } from "../assets/assets";
 
 const About = () => {
   return (
-    <div>
-      <div className=" text-2xl text-center !pt-8 border-t border-gray-300">
-        <Title text1={"เกี่ยวกับ"} text2={"เรา"} />
-      </div>
-      <div className="!my-10 flex flex-col md:flex-row gap-16">
-          <img className="w-full md:max-w-[450px]" src={assets.about_img} alt="about_img" />
-          <div className="flex flex-col justify-center gap-6 md:w-2/4 text-gray-600">
-              <p>Forever was born out of a passion for innovation and a desire to revolutionize the way people shop online. Our
-                 journey began with a simple idea: to provide a platform where customers can easily discover, explore,
-                 and purchase a wide range of products from the comfort of their homes.</p>
-              <p>Since our inception, we've worked tirelessly to curate a diverse selection of high-quality products that cater
-                 to every taste and preference. From fashion and beauty to electronics and home essentials, we offer 
-                an extensive collection sourced from trusted brands and suppliers.</p>
-              <b className="text-gray-800"> Our Missing</b>
-              <p>Our mission at Forever is to empower customers with choice, convenience, and confidence. We're dedicated to providing a seamless shopping
-                 experience that exceeds expectations, from browsing and ordering to delivery and beyond.</p>
+    <div className="bg-gray-50">
+      {/* Section: เกี่ยวกับเรา */}
+      <div className="container !mx-auto !px-4 !py-12 border-t border-gray-300">
+        <div className="text-2xl  text-center text-gray-800 !mb-8">
+          <Title text1={"เกี่ยวกับ"} text2={"เรา"} />
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-12 items-center">
+          {/* Image Section */}
+          <img
+            className="w-full md:w-1/2 rounded-lg shadow-lg"
+            src={assets.about_img}
+            alt="about_img"
+          />
+          {/* Text Section */}
+          <div className="flex flex-col justify-center gap-6 text-gray-700 md:w-1/2">
+            <p className="text-xl font-semibold text-gray-800">
+              ยินดีต้อนรับสู่ ForCosplay จักรวาลแห่งคอสเพลย์ที่เปิดกว้างสำหรับทุกคน!
+            </p>
+            <p>
+              เราคือแพลตฟอร์ม E-commerce ที่เกิดจากความหลงใหลในโลกของคอสเพลย์และการสร้างสรรค์ตัวละครจากหลากหลายสื่อ ไม่ว่าจะเป็นเกม, อนิเมะ, ภาพยนตร์, มังงะ หรือแม้แต่ผลงานศิลปะแฟนอาร์ต
+              เราพร้อมมอบประสบการณ์ที่ไม่เหมือนใครให้กับทุกคนที่หลงใหลในการแปลงโฉมเป็นตัวละครโปรดของคุณ
+            </p>
+
+            <b className="text-lg text-gray-800">สิ่งที่เรามอบให้</b>
+            <div>
+              <p className="text-gray-800 font-medium">1. ขายและเช่าชุดคอสเพลย์</p>
+              <p>
+                เรามีชุดคอสเพลย์คุณภาพสูงหลากหลายสไตล์ ตั้งแต่ชุดยอดนิยมจากซีรีส์ดัง ไปจนถึงการออกแบบเฉพาะทางที่หาได้ยาก นอกจากนี้ยังมีบริการเช่าชุดสำหรับผู้ที่ต้องการใช้งานชั่วคราว เช่น งานอีเวนต์ คอนเสิร์ต หรือแค่ต้องการทดลองสวมใส่!
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-800 font-medium">2. หลากหลายตัวเลือกจากทุกมุมโลก</p>
+              <p>
+                ไม่ว่าคุณจะเป็นแฟนพันธุ์แท้ของอนิเมะญี่ปุ่น, เกมระดับโลก, หรือภาพยนตร์ฮอลลีวูด เรามีชุดที่ตอบโจทย์ทุกความต้องการ รวมถึงอุปกรณ์เสริมและเครื่องประดับที่ครบครัน เพื่อให้คุณสามารถสร้างคาแรกเตอร์ได้อย่างสมบูรณ์แบบ
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-800 font-medium">3. โปรเจกต์จบจากหัวใจและความฝัน</p>
+              <p>
+                เว็บไซต์นี้ไม่ใช่แค่ธุรกิจ แต่เป็นส่วนหนึ่งของโปรเจกต์จบของเราเอง ที่เกิดจากความตั้งใจและแรงบันดาลใจของกลุ่มนักศึกษาที่รักในวงการคอสเพลย์ เราหวังว่าเว็บไซต์นี้จะกลายเป็นพื้นที่ที่ช่วยสนับสนุนและเชื่อมโยงคนที่มีใจรักในศิลปะการแปลงโฉมเข้าด้วยกัน
+              </p>
+            </div>
           </div>
+        </div>
       </div>
-      <div className=" ">
-        <div className=" text-xl  !py-4 border-t border-gray-300">
+
+      {/* Section: เหตุใดจึงควรเลือกเรา */}
+      <div className="container !mx-auto !px-4 !py-12 border-t border-gray-300">
+        <div className="text-3xl font-bold text-center text-gray-800 !mb-8">
           <Title text1={"เหตุใดจึงควร"} text2={"เลือกเรา"} />
         </div>
-        <div className="flex flex-col md:flex-row text-sm !mb-20 ">
-          <div className="border border-gray-300 !px-10 !md:px-16 !py-8 !sm:py-20 flex flex-col gap-5">
-              <b>Quality Assurance:</b>
-              <p className="text-gray-600">We meticulously select and vet each product to ensure it meets our stringent quality standards.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Card 1 */}
+          <div className="bg-white !p-6 rounded-lg shadow-md border border-gray-200">
+            <b className="text-lg text-gray-800">คุณภาพที่ไว้ใจได้:</b>
+            <p className="text-gray-600 !mt-2">
+              ทุกชุดคอสเพลย์ของเราผลิตขึ้นอย่างพิถีพิถัน โดยคำนึงถึงรายละเอียดและความสะดวกสบายของผู้สวมใส่
+            </p>
           </div>
-          <div className="border border-gray-300 !px-10 !md:px-16 !py-8 !sm:py-20 flex flex-col gap-5">
-              <b>Convenience:</b>
-              <p className="text-gray-600">With our user-friendly interface and hassle-free ordering process, shopping has never been easier.</p>
+          {/* Card 2 */}
+          <div className="bg-white !p-6 rounded-lg shadow-md border border-gray-200">
+            <b className="text-lg text-gray-800">ราคาที่เอื้อมถึง:</b>
+            <p className="text-gray-600 !mt-2">
+              เราเข้าใจว่าคอสเพลย์อาจเป็นงานอดิเรกที่ใช้เงินจำนวนมาก เราจึงพยายามนำเสนอสินค้าในราคาที่เหมาะสม พร้อมโปรโมชันพิเศษตลอดทั้งปี
+            </p>
           </div>
-          <div className="border border-gray-300 !px-10 !md:px-16 !py-8 !sm:py-20 flex flex-col gap-5">
-              <b>Exceptional Customer Service:</b>
-              <p className="text-gray-600">Our team of dedicated professionals is here to assist you the way, ensuring your satisfaction is our top priority.</p>
+          {/* Card 3 */}
+          <div className="bg-white !p-6 rounded-lg shadow-md border border-gray-200">
+            <b className="text-lg text-gray-800">บริการที่เป็นมิตร:</b>
+            <p className="text-gray-600 !mt-2">
+              ทีมงานของเราพร้อมให้คำแนะนำและช่วยเหลือคุณเสมอ ไม่ว่าจะเป็นการเลือกชุด การปรับขนาด หรือสอบถามรายละเอียด
+            </p>
           </div>
+        </div>
       </div>
-      </div>
-  
     </div>
   );
 };

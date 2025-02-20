@@ -1,98 +1,100 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { Button } from "@material-tailwind/react";
+import { toast } from "react-toastify";
 import { parse, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
+import { getRentals, returnRental } from "../../api/user"; // Import API functions
+import useEcomStore from "../../store/ecom-store";
+import { format } from "date-fns";
 
 const RentalTracking = () => {
-  // Sample Data: รายการคำสั่งเช่า
+  const token = useEcomStore((state) => state.token);
+  const [rentals, setRentals] = useState([]);
 
+  // Fetch rentals on component mount
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Trigger re-render to update countdown
-    }, 1000);
-    return () => clearInterval(interval); // Cleanup interval
+    fetchRentals();
   }, []);
 
-  const [rentals, setRentals] = useState([
-    {
-      id: 1,
-      username:"JohnWickza123",
-      email: "user@example.com",
-      product: "Miku Rabbit Hole",
-      size: "L",
-      days: 7 ,
-      startDate: "11 ก.พ. 2025",
-      endDate: "18 ก.พ. 2025",
-      status: "Shipped",
-    },
-    {
-      id: 2,
-      username:"helloismeza45",
-      email: "user@example.com",
-      product: "Miku Rabbit Hole",
-      size: "M",
-      days: 7 ,
-      startDate: "03 ก.พ. 2025",
-      endDate: "18 ก.พ. 2025",
-      status: "Processing",
-    },
-    {
-      id: 3,
-      username:"OPeeessHP98",
-      email: "user@example.com",
-      product: "Miku Rabbit Hole",
-      size: "XL",
-      days: 14 ,
-      startDate: "05 ก.พ. 2025",
-      endDate: "16 ก.พ. 2025",
-      status: "Processing",
-    },
-  ]);
-
-  // Status Colors
-  const statusColors = {
-    Processing: "bg-blue-500 text-white",
-    Shipped: "bg-green-500 text-white",
-    Returned: "bg-gray-500 text-white",
-    Overdue: "bg-red-500 text-white",
-  };
-
-  // Function to parse Thai date string to Date Object
-  const parseThaiDate = (thaiDate) => {
-    const thaiMonths = {
-      "ม.ค.": "Jan",
-      "ก.พ.": "Feb",
-      "มี.ค.": "Mar",
-      "เม.ย.": "Apr",
-      "พ.ค.": "May",
-      "มิ.ย.": "Jun",
-      "ก.ค.": "Jul",
-      "ส.ค.": "Aug",
-      "ก.ย.": "Sep",
-      "ต.ค.": "Oct",
-      "พ.ย.": "Nov",
-      "ธ.ค.": "Dec",
-    };
-
-    const [day, month, year] = thaiDate.split(" ");
-    const formattedDate = `${day} ${thaiMonths[month]} ${year}`;
-    return parse(formattedDate, "d MMM yyyy", new Date());
-  };
-
-  // Function to calculate time left
-  const calculateTimeLeft = (endDate) => {
-    const parsedEndDate = parseThaiDate(endDate); // Parse Thai date
-    const now = new Date();
-
-    if (parsedEndDate > now) {
-      const days = differenceInDays(parsedEndDate, now);
-      const hours = differenceInHours(parsedEndDate, now) % 24;
-      const minutes = differenceInMinutes(parsedEndDate, now) % 60;
-      return { days, hours, minutes };
+  const fetchRentals = async () => {
+    try {
+      const response = await getRentals(token); // เรียก API
+      if (response.data) {
+        setRentals(response.data); // เก็บข้อมูลลงใน state
+      }
+    } catch (err) {
+      console.error("Error fetching rentals:", err);
     }
-    return { days: 0, hours: 0, minutes: 0 }; // Return 0 if overdue
   };
 
+  const dateFormat = (dateString) => {
+    if (!dateString) return "ไม่มีข้อมูล";
+    const date = new Date(dateString);
+    return format(date, "dd MMM yyyy"); // Format as "01 Jan 2023"
+  };
+
+
+
+  // Handle Return Rental
+  const handleReturnRental = async (id) => {
+    try {
+      const response = await returnRental(token, { orderId: id }); // เรียก API เพื่อแจ้งคืนสินค้า
+      if (response.data) {
+        toast.success(`แจ้งคืนสินค้าสำหรับคำสั่งเช่า ID: ${id}`);
+        fetchRentals(); // Refresh data after update
+      }
+    } catch (err) {
+      console.error("Error returning rental:", err);
+      toast.error("เกิดข้อผิดพลาดในการแจ้งคืนสินค้า");
+    }
+  };
+
+  const parseThaiDate = (thaiDate) => {
+    if (!thaiDate) {
+      console.error("Invalid date:", thaiDate);
+      return null;
+    }
+  
+    // ถ้าเป็นรูปแบบ ISO อยู่แล้วให้แปลงได้เลย
+    if (!isNaN(Date.parse(thaiDate))) {
+      return new Date(thaiDate);
+    }
+  
+    const thaiMonths = {
+      "ม.ค.": "Jan", "ก.พ.": "Feb", "มี.ค.": "Mar", "เม.ย.": "Apr",
+      "พ.ค.": "May", "มิ.ย.": "Jun", "ก.ค.": "Jul", "ส.ค.": "Aug",
+      "ก.ย.": "Sep", "ต.ค.": "Oct", "พ.ย.": "Nov", "ธ.ค.": "Dec"
+    };
+  
+    try {
+      const [day, month, year] = thaiDate.split(" ");
+      const formattedDate = `${day} ${thaiMonths[month]} ${year}`;
+      return parse(formattedDate, "d MMM yyyy", new Date());
+    } catch (err) {
+      console.error("Error parsing Thai date:", err);
+      return null;
+    }
+  };
+  
+
+
+  // Function to calculate remaining time
+  const calculateTimeLeft = (endDate) => {
+    if (!endDate) return { days: 0, hours: 0, minutes: 0, overdue: true };
+
+    const parsedEndDate = parseThaiDate(endDate);
+    if (!parsedEndDate) return { days: 0, hours: 0, minutes: 0, overdue: true };
+
+    const now = new Date();
+    const diffDays = differenceInDays(parsedEndDate, now);
+    const diffHours = differenceInHours(parsedEndDate, now) % 24;
+    const diffMinutes = differenceInMinutes(parsedEndDate, now) % 60;
+
+    if (parsedEndDate <= now) {
+      return { days: 0, hours: 0, minutes: 0, overdue: true };
+    }
+
+    return { days: diffDays, hours: diffHours, minutes: diffMinutes, overdue: false };
+  };
 
   // Update Status Automatically
   useEffect(() => {
@@ -101,7 +103,6 @@ const RentalTracking = () => {
         prevRentals.map((rental) => {
           const parsedEndDate = parseThaiDate(rental.endDate);
           const now = new Date();
-
           if (parsedEndDate < now && rental.status !== "Overdue") {
             return { ...rental, status: "Overdue" }; // Update status to Overdue
           }
@@ -109,23 +110,27 @@ const RentalTracking = () => {
         })
       );
     };
-
     const interval = setInterval(updateStatus, 1000); // Check every second
     return () => clearInterval(interval); // Cleanup interval
   }, []);
+  
 
-  // Columns for DataTable
+  // Columns for DataTable   
   const columns = [
-    { name: "ลำดับ", selector: (row) => row.id, sortable: true, width: "80px" },
-    { name: "ผู้เช่าสินค้า", selector: (row) => row.username, sortable: true },
+    { name: "ลำดับ", selector: (row, index) => index + 1, sortable: true, width: "80px" },
+    { name: "ผู้เช่าสินค้า", selector: (row) => row.username, sortable: true },
     { name: "สินค้า", selector: (row) => row.product, sortable: true },
-    { name: "ขนาด", selector: (row) => row.size, sortable: true, width: "100px" },
-    { name: "วันที่เริ่มต้น", selector: (row) => row.startDate, sortable: true },
-    { name: "วันที่สิ้นสุด", selector: (row) => row.endDate, sortable: true },
+    { name: "ขนาด", selector: (row) => row.size, sortable: true, width: "80px" },
+    { name: "วันที่เริ่มต้น", selector: (row) => dateFormat(row.startDate), sortable: true },
+    { name: "วันที่สิ้นสุด", selector: (row) => dateFormat(row.endDate), sortable: true },
     {
       name: "เวลาที่เหลือ",
       cell: (row) => {
+        console.log("endDate:", row.endDate); // เช็กว่ามันมีค่าหรือไม่
         const timeLeft = calculateTimeLeft(row.endDate);
+        if (timeLeft.overdue) {
+          return <span className="text-red-500 font-bold">เกินกำหนด</span>;
+        }
         return (
           <span>
             {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที
@@ -156,40 +161,26 @@ const RentalTracking = () => {
       name: "ดำเนินการ",
       cell: (row) => (
         <div className="flex gap-2">
-          <Button
-            className="!px-3 !py-1 bg-yellow-500 text-white"
-            onClick={() => handleExtendRental(row.id)}
+          <button
+            className="bg-yellow-500 text-white !px-3 !py-1 rounded-md"
+            onClick={() => alert(`ขยายเวลาเช่าสำหรับคำสั่งเช่า ID: ${row.id}`)}
           >
             ขยายเวลา
-          </Button>
-          <Button
-            className="!px-3 !py-1 bg-red-500 text-white"
+          </button>
+          <button
+            className="bg-red-500 text-white !px-3 !py-1 rounded-md"
             onClick={() => handleReturnRental(row.id)}
           >
             แจ้งคืนสินค้า
-          </Button>
+          </button>
         </div>
       ),
       width: "250px",
     },
   ];
 
-  // Handle Extend Rental
-  const handleExtendRental = (id) => {
-    alert(`ขยายเวลาเช่าสำหรับคำสั่งเช่า ID: ${id}`);
-    // TODO: Implement API call to extend rental
-  };
-
-  // Handle Return Rental
-  const handleReturnRental = (id) => {
-    alert(`แจ้งคืนสินค้าสำหรับคำสั่งเช่า ID: ${id}`);
-    // TODO: Implement API call to mark as returned
-  };
-
   return (
     <div className="!p-5 bg-white rounded-lg shadow-md">
-
-
       {/* DataTable */}
       <DataTable
         columns={columns}

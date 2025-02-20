@@ -17,6 +17,7 @@ const Checkout = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [address, setAddress] = useState("");
   const [addressSaved, setAddressSaved] = useState(false);
+  
 
   const value = {
     navigate
@@ -38,8 +39,8 @@ const Checkout = () => {
   };
 
   const hdlSaveAddress = () => {
-    if (!address) {
-      return toast.warning("กรุณากรอกที่อยู่ด้วยนะคะ! >_<");
+    if (!address || address.trim().length < 5) {
+      return toast.warning("กรุณากรอกที่อยู่อย่างน้อย 5 ตัวอักษร");
     }
     saveAddress(token, address)
       .then((res) => {
@@ -48,7 +49,8 @@ const Checkout = () => {
         setAddressSaved(true);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
+        toast.error("เกิดข้อผิดพลาดในการบันทึกที่อยู่");
       });
   };
   
@@ -99,49 +101,69 @@ const Checkout = () => {
         </div>
 
     {/* Item List */}
-          {Array.isArray(costumes) && costumes.length > 0 ? (
-        <>
-          {costumes.map((item, index) => (
-            <div key={index} className="!py-3">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="font-bold">{item.name}</p>
-                  <p className="text-sm">
-                    จำนวน : {item.count} x {numberFormat(item.price)}
+    {Array.isArray(costumes) && costumes.length > 0 ? (
+      <>
+
+        {costumes.map((item, index) => (
+          <div key={index} className="!py-3">
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="font-bold">{item.name}</p>
+                <p className="text-sm">
+                    จำนวน : {item.count} x {numberFormat(item.price)}{" "}
+                    {item.type === "RENTAL" && item.rentalDuration && (
+                      <span>({item.rentalDuration} วัน)</span>
+                    )}
                   </p>
-                </div>
-                <div>
+                {item.size && (
+                  <p className="text-sm text-gray-500">ขนาด: {item.size}</p>
+                )}
+                {item.type === "RENTAL" && item.rentalDuration && (
+                  <p className="text-sm text-gray-500">
+                    จำนวนวันเช่า: {item.rentalDuration} วัน
+                  </p>
+                )}
+                <p className="text-sm text-gray-500">
+                  ประเภท: {item.type === "RENTAL" ? "เช่า" : "ซื้อ"}
+                </p>
+              </div>
+              <div>
                   <p className="text-red-500 font-bold">
-                    {numberFormat(item.count * item.price)}
-                  </p>
-                </div>
+                  {numberFormat(
+                    item.count *
+                      (item.type === "RENTAL" && item.rentalDuration
+                        ? item.price * item.rentalDuration
+                        : item.price)
+                  )}
+                </p>
               </div>
             </div>
-          ))}
-        </>
-      ) : (
-        <p className="text-center text-gray-500">ไม่มีสินค้าในตะกร้า</p>
-      )}
+          </div>
+        ))}
+      </>
+    ) : (
+      <p className="text-center text-gray-500">ไม่มีสินค้าในตะกร้า</p>
+    )}
 
         <div className="text-2xl">
           <Title text1={'ยอดรวม'} text2={'ทั้งหมด'} />
         </div>
         <div className="flex flex-col gap-2 !mt-2 text-sm">
-          <div className="flex justify-between">
-            <p>ยอดรวมย่อย</p>
-            <p>{totalPrice ? numberFormat(totalPrice) + ".00 บาท" : "0.00 บาท"}</p>
+            <div className="flex justify-between">
+              <p>ยอดรวมย่อย</p>
+              <p>{totalPrice ? numberFormat(totalPrice) + ".00 บาท" : "0.00 บาท"}</p>
+            </div>
+            <hr className="border-gray-100" />
+            <div className="flex justify-between">
+              <p>ส่วนลด</p>
+              <p>-0.00 บาท</p>
+            </div>
+            <hr className="border-gray-100" />
+            <div className="flex justify-between">
+              <b>ยอดรวมทั้งหมด</b>
+              <b>{totalPrice ? numberFormat(totalPrice) + ".00 บาท" : "0.00 บาท"}</b>
+            </div>
           </div>
-          <hr className="border-gray-100" />
-          <div className="flex justify-between">
-            <p>ส่วนลด</p>
-            <p>-0.00 บาท</p>
-          </div>
-          <hr className="border-gray-100" />
-          <div className="flex justify-between">
-            <b>ยอดรวมทั้งหมด</b>
-            <b>{totalPrice ? numberFormat(totalPrice) + ".00 บาท" : "0.00 บาท"}</b>
-          </div>
-        </div>
     
   </div>
       </div>

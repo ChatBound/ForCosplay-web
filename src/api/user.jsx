@@ -61,3 +61,24 @@ export const getOrders = async (token) => {
     },
   });
 };
+
+
+export const getRentals = async (token) => {
+  // code body
+  return axios.get("https://for-cosplay-api.vercel.app/api/user/rentals", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+
+export const returnRental = async (token) => {
+  // code body
+  return axios.post("https://for-cosplay-api.vercel.app/api/user/return-rental", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+

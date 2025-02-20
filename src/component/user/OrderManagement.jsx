@@ -152,6 +152,7 @@ const OrderManagement = () => {
           <p><strong>ผู้ใช้งาน:</strong> {selectedOrder.orderBy.email}</p>
           <p><strong>ที่อยู่:</strong> {selectedOrder.orderBy.address}</p>
           <p><strong>วันที่สั่งซื้อ:</strong> {dateFormat(selectedOrder.createdAt)}</p>
+          
         </div>
         
         <h3 className="text-lg font-semibold !mt-6 border-b !pb-2">รายการสินค้า</h3>
@@ -161,17 +162,18 @@ const OrderManagement = () => {
               <p><strong>{costume.costume.name}</strong></p>
               <div className="grid grid-cols-2 gap-2 !mt-2 text-sm text-gray-600">
                 <span>จำนวน: {costume.count}</span>
-                <span>ขนาด: {costume.size}</span>
+                <span>ขนาด: {costume.size || "ไม่มีข้อมูล"}</span>
                 <span>ประเภท: {costume.type === "PURCHASE" ? "ซื้อ" : "เช่า"}</span>
+                {costume.type === "RENTAL" && (
+                    <span>จำนวนวันเช่า: {costume.rentalDuration || "ไม่มีข้อมูล"} วัน</span>
+                  )}
                 <span>
-                  ราคา: {numberFormat(
-                    costume.costume.salePrice > 0
-                      ? costume.costume.salePrice
-                      : costume.costume.rentalPrice > 0
-                      ? costume.costume.rentalPrice
-                      : 0
-                  )} บาท
-                </span>
+                    ราคา: {numberFormat(
+                      costume.type === "RENTAL" && costume.rentalDuration
+                        ? costume.costume.rentalPrice * costume.rentalDuration
+                        : costume.costume.salePrice || 0
+                    )} บาท
+                  </span>
               </div>
             </div>
           ))}

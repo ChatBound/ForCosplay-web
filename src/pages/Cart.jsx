@@ -13,6 +13,7 @@ const Cart = () => {
   const user = useEcomStore((state) => state.user);
   const token = useEcomStore((state) => state.token);
 
+//selectedRentalDuration: selectedRentalDuration
 
   const getTotalPrice = useEcomStore((state) => state.getTotalPrice);
   const actionUpdateQuantity = useEcomStore(
@@ -35,25 +36,28 @@ const Cart = () => {
       const hasInvalidItems = cart.some(
         (item) =>
           !item.selectedPurchaseType || // ตรวจสอบว่าเลือกประเภทการซื้อแล้ว
-          !item.selectedSize // ตรวจสอบว่าเลือกขนาดแล้ว
+          !item.selectedSize || // ตรวจสอบว่าเลือกขนาดแล้ว
+          (item.selectedPurchaseType === "RENTAL" && !item.selectedRentalDuration) // ตรวจสอบว่าเลือกจำนวนวันเช่าแล้ว
       );
-  
+      
       if (hasInvalidItems) {
-        toast.error("กรุณาเลือกประเภทการซื้อและขนาดสำหรับสินค้าทุกรายการ");
+        toast.error("กรุณาเลือกประเภทการซื้อ, ขนาด และจำนวนวันเช่า (หากเป็นการเช่า)");
         return;
       }
   
+
       const formattedCart = cart.map((item) => ({
         id: item.id,
         quantity: item.count, // ใช้ count จาก state
-        salePrice: item.selectedPurchaseType === "RENTAL" ? item.rentalPrice : item.salePrice,
+        salePrice:
+          item.selectedPurchaseType === "RENTAL"
+            ? item.rentalPrice * (item.selectedRentalDuration || 1) // คำนวณราคาเช่าตามจำนวนวัน
+            : item.salePrice, // ราคาขายปกติ
         selectedPurchaseType: item.selectedPurchaseType, // เพิ่มค่า selectedPurchaseType
-        size : item.selectedSize,
-        selectedSize: item.selectedSize,
-        
-        
-        
-        // เพิ่มขนาดสินค้า
+        selectedRentalDuration: item.selectedRentalDuration || null, // เพิ่มจำนวนวันเช่า (null หากไม่มี)
+        size: item.selectedSize, // เพิ่มขนาดสินค้า
+        selectedSize : item.selectedSize,
+        rentalDuration: item.selectedRentalDuration || null, // เพิ่มจำนวนวันเช่า (null หากไม่มี)
       }));
   
       await createUserCart(token, { cart: formattedCart })
@@ -107,21 +111,24 @@ const Cart = () => {
                   {product.name}
                 </p>
                 <p className="text-gray-500 text-xs">เหลือ: {product.quantity} ชิ้น</p>
-                <p className=" text-sm text-gray-500">ประเภท: 
-                  <span className="!mx-1">
-                  {(product.selectedPurchaseType === "RENTAL"
-                    ? "เช่า"
-                    : "ซื้อ")}
-                    
-                    </span> 
-                    </p>
-                <div className=" flex items-center gap-5 !mt-2">
-                <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100">
-                      {product.selectedSize}
-                    </p>
-
-                  <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100"></p>
-                </div>
+                <p className="text-sm text-gray-500">
+                        ประเภท:{" "}
+                        <span className="!mx-1">
+                          {product.selectedPurchaseType === "RENTAL"
+                            ? "เช่า"
+                            : "ซื้อ"}
+                        </span>
+                      </p>
+                    <div className="flex items-center gap-5 !mt-2">
+                      <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100">
+                        {product.selectedSize}
+                      </p>
+                      {product.selectedPurchaseType === "RENTAL" && (
+                        <p className="border border-gray-100 text-black !px-3 !py-1 !sm:px-3 !sm:py-1 bg-gray-100">
+                          {product.selectedRentalDuration} วัน
+                        </p>
+                      )}
+                    </div>
               </div>
             </div>
             <div className="flex justify-between">
@@ -163,12 +170,12 @@ const Cart = () => {
                 </button>
               </div>
               <div className="font-bold !mt-1 text-black">
-                {numberFormat(
-                  (product.selectedPurchaseType === "RENTAL"
-                    ? product.rentalPrice
-                    : product.salePrice) * product.count
-                )}
-              </div>
+                  {numberFormat(
+                    (product.selectedPurchaseType === "RENTAL"
+                      ? product.rentalPrice * (product.selectedRentalDuration || 1)
+                      : product.salePrice) * product.count
+                  )}
+                </div>
               {/* Right */}
               
             </div>

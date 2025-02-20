@@ -17,11 +17,11 @@ const Contact = () => {
         <div className=" flex flex-col justify-center items-start gap-6">
           <p className=" font-semibold text-xl text-gray-600"> ข้อมูลติดต่อ</p>
           <p className="text-gray-500">
-            เลขที่ 21 ถนนพหลโยธิน แขวงสนามบิน <br /> เขตดอนเมือง กรุงเทพฯ 10210
+          140 พิบูลสงคราม 22 เขตบางเขน อำเภอเมืองนนทบุรี  <br /> จังหวัดนนทบุรี 11000 ประเทศไทย
           </p>
           <p className="text-gray-500">
-            เบอร์โทร : 02-017-4444 ทุกวัน 24 ชั่วโมง <br /> อีเมล :
-            forcontentofficial@gmail.com
+            เบอร์โทร : 065-073-7177 (๋John) <br /> 
+            อีเมล : forcontentofficial@gmail.com
           </p>
           <ul>
             <li style={{ margin: "20px 0 20px 0" }}>

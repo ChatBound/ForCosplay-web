@@ -16,8 +16,8 @@ const Product = () => {
   const [mainImage, setMainImage] = useState(""); // รูปหลักที่แสดงผล
   const [loading, setLoading] = useState(true); // สถานะโหลดข้อมูล
   const [selectedPurchaseType, setSelectedPurchaseType] = useState(""); // บันทึกประเภทการซื้อ
-
   const [selectedSize, setSelectedSize] = useState(""); // State สำหรับเก็บขนาดที่เลือก
+  const [selectedRentalDuration, setSelectedRentalDuration] = useState(""); // State สำหรับเก็บจำนวนวันเช่าที่เลือก
 
   const setSize = (sizes) => {
     setSelectedSize(sizes); // อัปเดตขนาดที่เลือก
@@ -69,9 +69,9 @@ const Product = () => {
     }
   };
 
-  const calculateAvailableQuantity = () => {
-    return (product.quantity ?? 0) - (product.sold ?? 0);
-  };
+  console.log("Product Data:", product);
+
+  console.log(product.rentalOptions);
 
   return (
     <div className="border-t-2 border-gray-300 !pt-10 transition-opacity ease-in duration-500 opacity-100">
@@ -132,8 +132,33 @@ const Product = () => {
                   เช่า
                 </Button>
               )}
+
+              
             </div>
           </div>
+          {selectedPurchaseType === "RENTAL" && (
+            <div className="flex flex-col gap-4 !my-8">
+              <p>จำนวนวันเช่า</p>
+              <div className="flex gap-2 flex-wrap">
+                {Array.isArray(product.rentalOptions) && product.rentalOptions?.length > 0 ? (
+                  product.rentalOptions.map((option, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => setSelectedRentalDuration(option.duration)}
+                      className={`border border-gray-100 text-black !py-2 !px-6 bg-gray-100 ${
+                        option.duration === selectedRentalDuration ? "border-gray-500 bg-gray-300" : ""
+                      }`}
+                    >
+                      {option.duration} วัน (ราคา: {option.price} บาท)
+                    </Button>
+                  ))
+                ) : (
+                  <p>ไม่มีจำนวนวันเช่า</p> // แสดงข้อความหากไม่มีจำนวนวันเช่า
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="flex flex-col gap-4 !my-8">
             <p>เลือกขนาด</p>
             <div className="flex gap-2">
@@ -166,10 +191,15 @@ const Product = () => {
                 alert("กรุณาเลือกขนาด");
                 return;
               }
+              if (selectedPurchaseType === "RENTAL" && !selectedRentalDuration) {
+                alert("กรุณาเลือกจำนวนวันเช่า");
+                return;
+              }
               actionAddtoCart({
                 ...product,
                 selectedPurchaseType: selectedPurchaseType,
                 selectedSize: selectedSize,
+                selectedRentalDuration: selectedRentalDuration || null, // เพิ่มจำนวนวันเช่า
               });
               toast.success("สินค้าถูกเพิ่มลงตะกร้าเรียบร้อยแล้ว!");
             }}

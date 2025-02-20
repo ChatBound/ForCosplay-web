@@ -6,6 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import useEcomStore from "../store/ecom-store";
 
 
+
 const MainNav = () => {
   const [visible, setVisible] = useState(false);
   const user = useEcomStore((state) => state.user);
@@ -50,12 +51,15 @@ const MainNav = () => {
         </NavLink>
       </ul>
       <div className="flex items-center gap-6">
+        <Link to={'/category'}> 
         <img
           onClick={() => setShowSearch(true)}
+
           src={assets.search_icon}
           alt="search_icon"
           className="w-5 cursor-pointer"
         />
+        </Link>
         <div className="group relative">
           {/* แสดงไอคอนโปรไฟล์ */}
           <img
@@ -79,6 +83,9 @@ const MainNav = () => {
                 </Link>
                 <Link to="/user/history">
                   <p className="cursor-pointer hover:text-black">ประวัติการซื้อของฉัน</p>
+                </Link>
+                <Link to="/user/order">
+                  <p className="cursor-pointer hover:text-black">ติดตามเช่าสินค้าของฉัน</p>
                 </Link>
                 <hr />
                 <Link to={"/login"}  onClick={()=>logout()}>
@@ -188,6 +195,7 @@ const MainNav = () => {
                 {" "}
                บัญชีของฉัน{" "}
               </NavLink>
+              
               <NavLink
                 onClick={() => setVisible(false)}
                 className="!py-2 !pl-6 border"
@@ -196,6 +204,15 @@ const MainNav = () => {
               >
                 {" "}
                 ประวัติการซื้อของฉัน{" "}
+              </NavLink>
+              <NavLink
+                onClick={() => setVisible(false)}
+                className="!py-2 !pl-6 border"
+                style={{ padding: "10px" }}
+                to={"/user/order"}
+              >
+                {" "}
+                ติดตามเช่าสินค้าของฉัน{" "}
               </NavLink>
               <NavLink
                 onClick={()=>logout()}

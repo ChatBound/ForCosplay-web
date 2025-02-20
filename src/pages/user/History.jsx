@@ -25,7 +25,7 @@ const History = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-    case "NOT_PROCESS":
+      case "NOT_PROCESS":
         return "bg-gray-200 text-gray-800";
       case "PENDING":
         return "bg-blue-200 text-blue-800";
@@ -41,9 +41,9 @@ const History = () => {
   return (
     <div className="border-t border-gray-300 !pt-16">
       {/* Header */}
-      <div className='text-2xl text-center !mb-8'>
-            <Title text1={'การสั่งซื้อ'} text2={'ของฉัน'}/>
-        </div>
+      <div className="text-2xl text-center !mb-8">
+        <Title text1={"การสั่งซื้อ"} text2={"ของฉัน"} />
+      </div>
 
       {/* Orders List */}
       <div className="container !mx-auto !px-4 space-y-6">
@@ -62,6 +62,7 @@ const History = () => {
                 <div>
                   <p className="text-sm text-gray-500">วันที่สั่งซื้อ</p>
                   <p className="font-semibold">{dateFormat(item.updatedAt)}</p>
+
                 </div>
                 <div>
                   <span
@@ -93,35 +94,34 @@ const History = () => {
                         <td className="!py-2 !px-4">{costume.costume.name}</td>
                         <td className="!py-2 !px-4">
                           {numberFormat(
-                            costume.costume.salePrice > 0
-                              ? costume.costume.salePrice
-                              : costume.costume.rentalPrice > 0
-                              ? costume.costume.rentalPrice
-                              : 0
+                          costume.count *
+                          (costume.costume.salePrice > 0
+                          ? costume.costume.salePrice
+                          : costume.costume.rentalPrice > 0
+                          ? costume.costume.rentalPrice
+                          : 0)
                           )}
+                          </td>
+                        <td className="!py-2 !px-4">
+                          {costume.size || "ไม่มีข้อมูล"}
                         </td>
-                        <td className="!py-2 !px-4">{costume.size}</td>
                         <td className="!py-2 !px-4">{costume.count}</td>
                         <td className="!py-2 !px-4">
-                  
-                          {costume.type === "PURCHASE" && (
-                            <p>ซื้อ</p>
-                          )}
-                          {costume.type === "RENTAL" && (
-                            <p>เช่า</p>
-                          )}
-
-                        </td>
-                        <td className="!py-2 !px-4">
-                          {numberFormat(
-                            costume.count *
-                              (costume.costume.salePrice > 0
-                                ? costume.costume.salePrice
-                                : costume.costume.rentalPrice > 0
-                                ? costume.costume.rentalPrice
-                                : 0)
-                          )}
-                        </td>
+                              {costume.type === "PURCHASE" && <p>ซื้อ</p>}
+                              {costume.type === "RENTAL" && (
+                                <p>
+                                  เช่า ({costume.rentalDuration || "ไม่มีข้อมูล"} วัน)
+                                </p>
+                              )}
+                            </td>
+                            <td className="!py-2 !px-4">
+                              {numberFormat(
+                                costume.count *
+                                  (costume.type === "RENTAL" && costume.rentalDuration
+                                    ? costume.costume.rentalPrice * costume.rentalDuration
+                                    : costume.costume.salePrice || 0)
+                              )}
+                            </td>
                       </tr>
                     ))}
                   </tbody>

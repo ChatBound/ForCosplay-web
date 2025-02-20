@@ -15,6 +15,7 @@ const initialState = {
   available: "",
   categoryId: "",
   images: [],
+  rentalOptions: [] , // เพิ่ม rentalOptions
 };
 
 const FromProduct = () => {
@@ -24,6 +25,7 @@ const FromProduct = () => {
   const getCategory = useEcomStore((state) => state.getCategory);
   const categories = useEcomStore((state) => state.categories);
   const getProduct = useEcomStore((state) => state.getProduct);
+  const [rentalOptions, setRentalOptions] = useState([{ duration: "" }]);
   
 
   const [form, setForm] = useState(initialState);
@@ -62,15 +64,50 @@ const FromProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await createProduct(token, form);
+     // กรอง rentalOptions เพื่อให้มีเฉพาะข้อมูลที่ถูกต้อง
+  const validRentalOptions = rentalOptions.filter(
+    (option) => option.duration && !isNaN(form.rentalPrice)
+  );
+
+  // เพิ่ม rentalOptions เข้าไปใน form
+  const formData = {
+    ...form,
+    rentalOptions: validRentalOptions.length > 0
+      ? validRentalOptions.map((option) => ({
+          duration: parseInt(option.duration),
+          price: parseFloat(form.rentalPrice) * parseInt(option.duration), // คำนวณราคารวม
+        }))
+      : [], // Default เป็น array ว่างหากไม่มีข้อมูล
+  };
+  
+      const res = await createProduct(token, formData);
       console.log(res);
       setForm(initialState);
+      setRentalOptions([{ duration: "" }]); // Reset rentalOptions
       getProduct();
       toast.success(`เพิ่มข้อมูลสินค้าสำเร็จ`);
     } catch (err) {
       console.log(err);
     }
   };
+
+  // เพิ่มตัวเลือกใหม่
+const addRentalOption = () => {
+  setRentalOptions([...rentalOptions, { duration: "" }]);
+};
+
+// อัปเดตค่าของตัวเลือก
+const handleRentalOptionChange = (index, value) => {
+  const updatedOptions = [...rentalOptions];
+  updatedOptions[index].duration = value;
+  setRentalOptions(updatedOptions);
+};
+
+// ลบตัวเลือก
+const removeRentalOption = (index) => {
+  const updatedOptions = rentalOptions.filter((_, i) => i !== index);
+  setRentalOptions(updatedOptions);
+};
 
 
   const handlePurchaseTypeChange = (e) => {
@@ -240,7 +277,44 @@ const FromProduct = () => {
                     required
                   />
                 </div>
+
               )}
+               {/* วันเช่าที่มี */}
+
+               {(purchaseType === "Rent" || purchaseType === "All") && (
+                    <div className="!my-3">
+                      <label className="block text-sm font-medium">
+                        จำนวนวันที่เช่าได้ (สำหรับเช่า){" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      {rentalOptions.map((option, index) => (
+                        <div key={index} className="flex items-center gap-2 mb-2">
+                          <input
+                            type="number"
+                            placeholder="จำนวนวัน"
+                            value={option.duration}
+                            onChange={(e) => handleRentalOptionChange(index, e.target.value)}
+                            className="w-24 border !p-2 rounded-md"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeRentalOption(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ลบ
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addRentalOption}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        + เพิ่มตัวเลือกจำนวนวันเช่า
+                      </button>
+                    </div>
+                  )}
 
               {/* Images */}
               <div className="!my-3">
