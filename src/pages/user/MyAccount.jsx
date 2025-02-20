@@ -23,7 +23,7 @@ const MyAccount = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/user/profile",
+          "https://for-cosplay-api.vercel.app/api/user/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -65,7 +65,7 @@ const MyAccount = () => {
 
     try {
       await axios.patch(
-        "http://localhost:5001/api/user/update-profile",
+        "https://for-cosplay-api.vercel.app/api/user/update-profile",
         {
           name: formData.name,
           email: formData.email,
